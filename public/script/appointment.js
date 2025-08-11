@@ -43,12 +43,21 @@ async function renderList() {
     const edit = document.createElement('button');
     edit.textContent = 'Reschedule';
     edit.onclick = async () => {
-      const newTime = prompt('Enter new date/time (YYYY-MM-DDTHH:mm):', a.date?.slice(0,16));
-      if (!newTime) return;
-      const result = await API.update(a._id, { date: newTime, dentist: a.dentist });
-      if (!result.ok) return alert(result.data.message || 'Update failed');
-      renderList();
-    };
+    const newTime = prompt('Enter new date/time (YYYY-MM-DDTHH:mm):', a.date?.slice(0,16));
+    if (!newTime) return;
+    const result = await API.update(a._id, {
+      date: newTime,
+      time: newTime,     // ← important: send time too
+      dentist: a.dentist
+    });
+    if (!result.ok) {
+      console.log('PUT failed', result);           // ← helps you see the server message/status
+      return alert(result.data?.message || 'Update failed');
+    }
+    renderList();
+};
+
+    
 
     //delete
     const del = document.createElement('button');
@@ -75,12 +84,24 @@ document.getElementById('appointmentForm').addEventListener('submit', async func
   const doctor = document.getElementById('doctor').value;
   const time   = document.getElementById('time').value;
 
+
+  const timeVal = document.getElementById('time').value;
   const payload = {
-    patientName: localStorage.getItem('demoUser') || 'Guest',
-    dentist: doctor,
-    date: time,
-    reason: ''
-  };
+  patientName: localStorage.getItem('demoUser') || 'Guest',
+  dentist: doctor,
+  date: timeVal,
+  time: timeVal,      
+  reason: ''
+
+  // const payload = {
+  //   patientName: localStorage.getItem('demoUser') || 'Guest',
+  //   dentist: doctor,
+  //   date: time,
+  //   time: time,
+  // reason: ''
+};
+
+
 
   const { ok, data } = await API.create(payload);
   if (!ok) return alert(data.message || 'Booking failed');

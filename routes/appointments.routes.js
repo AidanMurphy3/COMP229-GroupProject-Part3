@@ -29,20 +29,29 @@ router.post('/',
   body('patientName').notEmpty(),
   body('dentist').notEmpty(),
   body('date').isISO8601(),
+  body('time').notEmpty(),
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
     try {
-      const { patientName, dentist, date, reason } = req.body;
-      const when = new Date(date);
-      if (await hasConflict({ dentist, date: when })) {
-        return res.status(409).json({ message: 'That time is already booked with this dentist' });
-      }
+      // before: const { patientName, dentist, date, reason } = req.body;
+      const { patientName, dentist, date, time, reason } = req.body;  // ← include time
+
+      // conflict check (keep as you had it)
+      const conflict = await Appointment.findOne({ dentist, date: new Date(date) });
+      if (conflict) return res.status(409).json({ message: 'Time slot already booked for this dentist' });
+
       const created = await Appointment.create({
-        patientName, dentist, date: when, reason: reason || null, createdBy: req.user.id
+        patientName,
+        dentist,
+        date: new Date(date),
+        time,                       // ← use the variable you just destructured
+        reason,
+        createdBy: req.user.id
       });
       res.status(201).json(created);
-    } catch (e) {
+    
+     } catch (e) {
       res.status(500).json({ message: e.message });
     }
   }
@@ -96,3 +105,41 @@ router.delete('/:id', auth(), async (req, res) => {
 });
 
 module.exports = router;
+
+//PUT /api/appointments/:id  (reschedule / edit)
+router.put('/:id', auth(),
+  async (req, res) => {
+    try {
+      const appt = await Appointment.findById(req.params.id);
+      if (!appt) return res.status(404).json({ message: 'Not found' });
+
+      //only owner or admin
+      if (String(appt.createdBy) !== req.user.id && req.user.role !== 'admin') {
+        return res.status(403).json({ message: 'Forbidden' });
+      }
+
+      
+      const { date, time, dentist, reason } = req.body;
+
+      //conflict check only if date/dentist change
+      if ((date && date !== appt.date?.toISOString()) || (dentist && dentist !== appt.dentist)) {
+        const conflict = await Appointment.findOne({
+          _id: { $ne: appt._id },
+          dentist: dentist ?? appt.dentist,
+          date: date ? new Date(date) : appt.date
+        });
+        if (conflict) return res.status(409).json({ message: 'Time slot already booked for this dentist' });
+      }
+
+      if (date)    appt.date = new Date(date);
+      if (time)    appt.time = time;         
+      if (dentist) appt.dentist = dentist;
+      if (reason !== undefined) appt.reason = reason;
+
+      await appt.save();
+      res.json(appt);
+    } catch (e) {
+      res.status(500).json({ message: e.message });
+    }
+  }
+);
