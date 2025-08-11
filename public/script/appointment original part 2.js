@@ -9,13 +9,19 @@ document.getElementById('appointmentForm').addEventListener('submit', async func
   const time = document.getElementById('time').value;
 
   try {
-    const res = await fetch('http://localhost:3000/api/appointments', {
+    const res = await fetch('/api/appointments', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${localStorage.getItem('demoToken')}`
       },
-      body: JSON.stringify({ doctor, time })
+      body: JSON.stringify({
+      patientName: localStorage.getItem('demoUser') || 'Guest',
+      dentist: doctor,
+      date: time,
+      reason: ''
+})
+
     });
     const data = await res.json();
 

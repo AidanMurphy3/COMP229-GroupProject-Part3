@@ -22,3 +22,9 @@ input, select, button {
   color: red;
   margin-top: 10px;
 }
+.hero { text-align:center; padding: 2rem 1rem; }
+.hero .primary { padding:.6rem 1.2rem; font-weight:600; }
+
+.grid { display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:1rem; padding:1rem; }
+.card { border:1px solid #ddd; border-radius:.5rem; padding:1rem; background:#fff; }
+.card h3 { margin:.2rem 0 .3rem; }
