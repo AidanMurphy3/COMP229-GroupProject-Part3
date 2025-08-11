@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Profile</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- navbar injected by nav.js if you included it -->
+  <h2>My Profile</h2>
+
+  <section>
+    <h3>Account</h3>
+    <div><strong>Name/Account:</strong> <span id="acctName">—</span></div>
+    <div><strong>Email (if used at login):</strong> <span id="acctEmail">—</span></div>
+    <div><strong>User ID:</strong> <span id="acctId">—</span></div>
+    <div><strong>Role:</strong> <span id="acctRole">—</span></div>
+    <div><strong>Password:</strong> <span title="Passwords are not stored in plain text.">******** (hidden)</span></div>
+    <!-- Optional: link to a future change-password page -->
+    <!-- <a href="change-password.html">Change password</a> -->
+  </section>
+
+  <hr/>
+
+  <section>
+    <h3>Patient Profile</h3>
+    <div><strong>Date of Birth:</strong> <span id="ppDob">—</span></div>
+    <div><strong>Address:</strong> <span id="ppAddress">—</span></div>
+    <div><strong>Phone:</strong> <span id="ppPhone">—</span></div>
+    <div><strong>Notes:</strong> <span id="ppNotes">—</span></div>
+  </section>
+
+  <hr/>
+
+  <section>
+    <h3>My Appointments</h3>
+    <ul id="apptList"></ul>
+  </section>
+
+  <script src="script/nav.js"></script>
+  <script src="script/myprofile.js"></script>
+</body>
+</html>
